@@ -1,0 +1,15 @@
+{
+  "GET_TOKEN_LIST": "成功获取币种列表。",
+  "GET_POOL_LIST": "成功获取池子列表。",
+  "CREATE_POOL":"成功创建池子。",
+  "CREATE_POOLTOKEN":"成功添加代币。",
+  "UPDATE_POOLTOKEN":"成功修改代币信息。",
+  "INIT_LIQ":"成功初始化流动性。",
+  "JOIN_LIQ":"成功添加流动性。",
+  "EXIT_LIQ":"成功删除流动性。",
+  "BatchSwapExact":"成功批量交易。",
+  
+  
+
+  "1001": "参数不完整。"
+}

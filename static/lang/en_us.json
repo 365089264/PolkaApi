@@ -1,0 +1,15 @@
+{
+  
+  "GET_TOKEN_LIST": "Get the list of token  successfully.",
+  "GET_POOL_LIST": "Get the list of pool  successfully.",
+  "CREATE_POOL":"create pool  successfully.",
+  "CREATE_POOLTOKEN":"Add token successfully.",
+  "UPDATE_POOLTOKEN":"Update token successfully.",
+  "INIT_LIQ":"Init liquidity successfully",
+  "JOIN_LIQ":"Join liquidity successfully",
+  "EXIT_LIQ":"Exit liquidity successfully",
+  "BatchSwapExact":"BatchSwapExact successfully",
+  
+
+  "1001": "The parameters are incomplete."
+}
