@@ -31,7 +31,7 @@ const queryFormat = dbhelper.queryFormat;
  * @author  wss
  */
  exports.getTokenList= async () => {
-    let query = queryFormat('select tokenAddress,tokenName,price from tb_tokenPrice order by createdAt desc', []);
+    let query = queryFormat('select tokenAddress as address,tokenName as name ,price,symbol,decimals,precisions as \'precision\',color,hasIcon,logoURL from tb_tokenPrice order by createdAt desc', []);
     let data= await P(pool, 'query', query);
     return {
         data: data.length ? data : []
