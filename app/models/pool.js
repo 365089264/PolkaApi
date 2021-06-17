@@ -67,13 +67,14 @@ const cptBase=new BigNumber(Math.pow(10,10));
         };
         let totalDenormal=new BigNumber(result[i].denormal);
         
-        query=queryFormat('select a.tokenAddress ,a.tokenName , a.poolID ,a.amount ,a.denormal,b.decimals,b.precisions,b.price,b.color,b.hasIcon,b.logoURL from tb_pool_token a inner join tb_tokenPrice b on a.tokenAddress=b.tokenAddress where a.poolID=? order by a.tokenIndex',r.id);
+        query=queryFormat('select b.symbol,a.tokenAddress ,a.tokenName , a.poolID ,a.amount ,a.denormal,b.decimals,b.precisions,b.price,b.color,b.hasIcon,b.logoURL from tb_pool_token a inner join tb_tokenPrice b on a.tokenAddress=b.tokenAddress where a.poolID=? order by a.tokenIndex',r.id);
         let tokens=await P(pool,'query',query);
         for (let c of tokens){
             let denormal=new BigNumber(c.denormal);
             r.tokens.push({
                 id: r.poolID,
                 address: c.tokenAddress,
+                symbol: c.symbol,
                 balance: c.amount,
                 decimals: c.decimals,
                 precision: c.precisions,
