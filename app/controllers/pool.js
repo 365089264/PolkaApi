@@ -67,8 +67,8 @@ const ERROR_CODE = 1000;
  * @author wss
  */
  exports.createPool = async(ctx)=>{
-    let { poolID, accountID, controllerID, tokenNums,swapFee,finalize,cptAmount,denormal } = ctx.request.body;
-    let result=await Pool.createPool(poolID, accountID, controllerID, tokenNums,swapFee,finalize,cptAmount,denormal);
+    let { poolID, accountID, controllerID, tokenNums,swapFee,finalize,cptAddress,cptAmount,denormal } = ctx.request.body;
+    let result=await Pool.createPool(poolID, accountID, controllerID, tokenNums,swapFee,finalize,cptAddress,cptAmount,denormal);
     if (!result) {
         // 提交失败
         //await Pool.Failed(tx_info.trans_id);

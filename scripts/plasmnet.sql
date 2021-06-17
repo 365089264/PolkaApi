@@ -24,6 +24,7 @@ CREATE  TABLE `tb_pool_history` (
     tokenNums           int(10) NOT NULL                                    comment '代币种类数量',
     swapFee             decimal(7,5)  NOT NULL                              comment '交易费',
     finalize            tinyint(1) NOT NULL DEFAULT 0                       comment '是否创建成功 0-创建中 1-创建成功',
+    cptAddress          varchar(60) NOT NULL                                comment 'cpt地址',
     cptAmount           int(10) NOT NULL                                    comment '总流动性cpt的数量',
     denormal            bigint(20) NOT NULL                                 comment '代币权重',
     createdAt           timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP        comment '申请创建时间'

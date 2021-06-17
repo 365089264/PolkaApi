@@ -39,19 +39,20 @@ const cptBase=new BigNumber(Math.pow(10,10));
         let start = (page - 1) * limit;
         let end = limit;
         query_count=queryFormat('select count(*) as count from tb_pool_history limit ?, ?',[start,end]);
-        query=queryFormat('select poolID,controllerID,tokenNums,swapFee,cptAmount,denormal from tb_pool_history order by createdAt desc  limit ?, ?', [start,end]);
+        query=queryFormat('select poolID,controllerID,tokenNums,swapFee,cptAmount,cptAddress,denormal from tb_pool_history order by createdAt desc  limit ?, ?', [start,end]);
     }
     else if (queryType==1){
-        query = queryFormat('select poolID,controllerID,tokenNums,swapFee,cptAmount,denormal from tb_pool_history where controllerID = ? order by createdAt desc', [accountId]);
+        query = queryFormat('select poolID,controllerID,tokenNums,swapFee,cptAmount,cptAddress,denormal from tb_pool_history where controllerID = ? order by createdAt desc', [accountId]);
     }
     else if (queryType==2){
-        query = queryFormat('select poolID,controllerID,tokenNums,swapFee,cptAmount,denormal from tb_pool_history where controllerID <> ? and poolID in (select poolID from tb_liquidity where accountID= ? ) order by createdAt desc', [accountId,accountId]);
+        query = queryFormat('select poolID,controllerID,tokenNums,swapFee,cptAmount,cptAddress,denormal from tb_pool_history where controllerID <> ? and poolID in (select poolID from tb_liquidity where accountID= ? ) order by createdAt desc', [accountId,accountId]);
     }
     let result= await P(pool, 'query', query);
     for (let i=0;i<result.length;i++){
         let r={
             id:result[i].poolID,
             poolAddress:result[i].poolID,
+            cptAddress:result[i].cptAddress,
             controller:result[i].controllerID,
             swapFee:result[i].swapFee,
             swaps:[],
@@ -124,12 +125,13 @@ const cptBase=new BigNumber(Math.pow(10,10));
  * @author  wss
  */
  exports.getPoolDetails= async (poolID) => {
-    let query = queryFormat('select poolID,controllerID,tokenNums,swapFee,cptAmount,denormal from tb_pool_history where poolID = ? order by createdAt desc', [poolID]);
+    let query = queryFormat('select poolID,controllerID,tokenNums,swapFee,cptAmount,cptAddress,denormal from tb_pool_history where poolID = ? order by createdAt desc', [poolID]);
     let result= await P(pool, 'query', query);
     for (let i=0;i<result.length;i++){
         let r={
             id:result[i].poolID,
             poolAddress:result[i].poolID,
+            cptAddress:result[i].cptAddress,
             controller:result[i].controllerID,
             swapFee:result[i].swapFee,
             swaps:[],
@@ -165,6 +167,12 @@ const cptBase=new BigNumber(Math.pow(10,10));
             r.tokensList.push(c.tokenAddress)
         }
 
+        query=queryFormat('select IFNULL (sum(case when addtype=1 then 1 else 0 end ),0)  as joinsCount,IFNULL(sum(case when addtype=-1 then 1 else 0 end ),0)  as exitsCount,IFNULL(count(distinct accountID),0) as holdersCount from tb_liquidity where poolID = ?',poolID)        
+        let s=await P(pool,'query',query);
+        r.joinsCount=s[0].joinsCount;
+        r.exitsCount=s[0].exitsCount;
+        r.holdersCount=s[0].holdersCount;
+
         query=queryFormat('select count(1) as count,sum(swapVolume) as totalSwapVolume from tb_pool_swap where poolID=? ',r.id);
         let swapsTotal=await P(pool,'query',query);
         r.swapsCount=swapsTotal[0].count;
@@ -197,12 +205,12 @@ const cptBase=new BigNumber(Math.pow(10,10));
  * @return {number} // 创建成功的主键ID
  * @author  wss
  */
- exports.createPool= async (poolID, accountID, controllerID, tokenNums,swapFee,finalize,cptAmount,denormal) => {
+ exports.createPool= async (poolID, accountID, controllerID, tokenNums,swapFee,finalize,cptAddress,cptAmount,denormal) => {
      console.log(swapFee.replace(/,/g,''))
     let query = queryFormat(`
     insert into tb_pool_history 
-    set  poolID = ?, accountID = ?, controllerID = ?, tokenNums = ?, swapFee = ?, finalize = ?, cptAmount = ?, denormal = ?`
-    , [poolID, accountID, controllerID, tokenNums,(new BigNumber(swapFee.replace(/,/g,''))).dividedBy(feeBase).toString(),finalize,(new BigNumber(cptAmount.replace(/,/g,''))).dividedBy(cptBase).toString(),(new BigNumber(denormal.replace(/,/g,''))).dividedBy(denormalBase).toString()]);
+    set  poolID = ?, accountID = ?, controllerID = ?, tokenNums = ?, swapFee = ?, finalize = ?,cptAddress  = ? , cptAmount = ?, denormal = ?`
+    , [poolID, accountID, controllerID, tokenNums,(new BigNumber(swapFee.replace(/,/g,''))).dividedBy(feeBase).toString(),finalize,cptAddress,(new BigNumber(cptAmount.replace(/,/g,''))).dividedBy(cptBase).toString(),(new BigNumber(denormal.replace(/,/g,''))).dividedBy(denormalBase).toString()]);
     let result = await P(pool, 'query', query);
     return result.insertId
  }
