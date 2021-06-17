@@ -22,7 +22,7 @@ CREATE  TABLE `tb_pool_history` (
     accountID           varchar(60) NOT NULL                                comment '创建账号',
     controllerID        varchar(60) NOT NULL                                comment '池子所有权的账号',
     tokenNums           int(10) NOT NULL                                    comment '代币种类数量',
-    swapFee             bigint(20) NOT NULL                                 comment '交易费',
+    swapFee             decimal(7,5)  NOT NULL                                 comment '交易费',
     finalize            tinyint(1) NOT NULL DEFAULT 0                       comment '是否创建成功 0-创建中 1-创建成功',
     cptAmount           int(10) NOT NULL                                    comment '总流动性cpt的数量',
     denormal            bigint(20) NOT NULL                                 comment '代币权重',

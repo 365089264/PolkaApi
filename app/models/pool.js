@@ -21,6 +21,9 @@ const pool = dbhelper.pool;
 const queryFormat = dbhelper.queryFormat;
 const BigNumber = require('bignumber.js');
 
+const denormalBase=new BigNumber(Math.pow(10,10));
+const feeBase=new BigNumber(Math.pow(10,6));
+const cptBase=new BigNumber(Math.pow(10,10));
 
 /**
  * @function 查询池子列表
@@ -45,20 +48,18 @@ const BigNumber = require('bignumber.js');
         query = queryFormat('select poolID,controllerID,tokenNums,swapFee,cptAmount,denormal from tb_pool_history where controllerID <> ? and poolID in (select poolID from tb_liquidity where accountID= ? ) order by createdAt desc', [accountId,accountId]);
     }
     let result= await P(pool, 'query', query);
-    let denormalBase=new BigNumber(Math.pow(10,10));
-    let feeBase=new BigNumber(Math.pow(10,7));
+    console.log(result)
     for (let i=0;i<result.length;i++){
-        let fee=new BigNumber(result[i].swapFee);
         let r={
             id:result[i].poolID,
             poolAddress:result[i].poolID,
             controller:result[i].controllerID,
-            swapFee:fee.dividedBy(feeBase),
+            swapFee:result[i].swapFee,
             swaps:[],
             tokens:[],
             tokensList:[],
             totalShares:result[i].cptAmount,
-            totalWeight:(new BigNumber(result[i].denormal)).dividedBy(denormalBase),
+            totalWeight:result[i].denormal,
             finalized: true,
             crp: false,
             publicSwap: true,
@@ -76,7 +77,7 @@ const BigNumber = require('bignumber.js');
                 address: c.tokenAddress,
                 balance: c.amount,
                 decimals: 10,
-                denormWeight: denormal.dividedBy(denormalBase),
+                denormWeight: denormal,
                 num:denormal.multipliedBy(100).dividedToIntegerBy(totalDenormal)
             });
             r.tokensList.push(c.tokenAddress)
@@ -125,9 +126,11 @@ const BigNumber = require('bignumber.js');
  * @author  wss
  */
  exports.createPool= async (poolID, accountID, controllerID, tokenNums,swapFee,finalize,cptAmount,denormal) => {
+     console.log(swapFee.replace(/,/g,''))
     let query = queryFormat(`
     insert into tb_pool_history 
-    set  poolID = ?, accountID = ?, controllerID = ?, tokenNums = ?, swapFee = ?, finalize = ?, cptAmount = ?, denormal = ?`, [poolID, accountID, controllerID, tokenNums,swapFee,finalize,cptAmount,denormal]);
+    set  poolID = ?, accountID = ?, controllerID = ?, tokenNums = ?, swapFee = ?, finalize = ?, cptAmount = ?, denormal = ?`
+    , [poolID, accountID, controllerID, tokenNums,(new BigNumber(swapFee.replace(/,/g,''))).dividedBy(feeBase).toString(),finalize,(new BigNumber(cptAmount.replace(/,/g,''))).dividedBy(cptBase).toString(),(new BigNumber(denormal.replace(/,/g,''))).dividedBy(denormalBase).toString()]);
     let result = await P(pool, 'query', query);
     return result.insertId
  }
