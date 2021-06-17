@@ -48,7 +48,6 @@ const cptBase=new BigNumber(Math.pow(10,10));
         query = queryFormat('select poolID,controllerID,tokenNums,swapFee,cptAmount,denormal from tb_pool_history where controllerID <> ? and poolID in (select poolID from tb_liquidity where accountID= ? ) order by createdAt desc', [accountId,accountId]);
     }
     let result= await P(pool, 'query', query);
-    console.log(result)
     for (let i=0;i<result.length;i++){
         let r={
             id:result[i].poolID,
@@ -68,7 +67,7 @@ const cptBase=new BigNumber(Math.pow(10,10));
         };
         let totalDenormal=new BigNumber(result[i].denormal);
         
-        query=queryFormat('select tokenAddress ,tokenName , poolID ,amount ,denormal from tb_pool_token where poolID=? order by tokenIndex',r.id);
+        query=queryFormat('select a.tokenAddress ,a.tokenName , a.poolID ,a.amount ,a.denormal,b.decimals,b.precisions,b.price,b.color,b.hasIcon,b.logoURL from tb_pool_token a inner join tb_tokenPrice b on a.tokenAddress=b.tokenAddress where a.poolID=? order by a.tokenIndex',r.id);
         let tokens=await P(pool,'query',query);
         for (let c of tokens){
             let denormal=new BigNumber(c.denormal);
@@ -76,7 +75,11 @@ const cptBase=new BigNumber(Math.pow(10,10));
                 id: r.poolID,
                 address: c.tokenAddress,
                 balance: c.amount,
-                decimals: 10,
+                decimals: c.decimals,
+                precision: c.precisions,
+                color: c.color,
+                hasIcon: c.hasIcon,
+                logoURL: c.logoURL,
                 denormWeight: denormal,
                 num:denormal.multipliedBy(100).dividedToIntegerBy(totalDenormal)
             });

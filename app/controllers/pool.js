@@ -73,9 +73,9 @@ const ERROR_CODE = 1000;
  * @author wss
  */
  exports.createPoolToken = async(ctx)=>{
-    let { tokens } = ctx.request.body;
+    let { tokens ,poolID} = ctx.request.body;
     for (var i = 0; i < tokens.length; i ++) {
-        let result=await Pool.createPoolToken(i, tokens[i].tokenAddress, tokens[i].tokenName, tokens[i].poolID,tokens[i].amount,tokens[i].denormal);
+        let result=await Pool.createPoolToken(i, tokens[i].address, tokens[i].name, poolID,tokens[i].amounts,tokens[i].weights);
         if (!result) {
             // 提交失败
             //await Pool.Failed(tx_info.trans_id);
