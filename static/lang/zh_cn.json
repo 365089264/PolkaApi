@@ -1,6 +1,7 @@
 {
   "GET_TOKEN_LIST": "成功获取币种列表。",
   "GET_POOL_LIST": "成功获取池子列表。",
+  "GET_POOL": "成功获取池子。",
   "CREATE_POOL":"成功创建池子。",
   "CREATE_POOLTOKEN":"成功添加代币。",
   "UPDATE_POOLTOKEN":"成功修改代币信息。",

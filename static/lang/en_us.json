@@ -2,6 +2,7 @@
   
   "GET_TOKEN_LIST": "Get the list of token  successfully.",
   "GET_POOL_LIST": "Get the list of pool  successfully.",
+  "GET_POOL": "Get the pool  successfully.",
   "CREATE_POOL":"create pool  successfully.",
   "CREATE_POOLTOKEN":"Add token successfully.",
   "UPDATE_POOLTOKEN":"Update token successfully.",

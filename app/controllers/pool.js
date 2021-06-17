@@ -20,7 +20,7 @@ const ERROR_CODE = 1000;
 
 
 /**
- * @function 获取所有代币信息
+ * @function 获取所有池子信息
  * @author wss
  */
  exports.getPoolList = async(ctx)=>{
@@ -30,6 +30,16 @@ const ERROR_CODE = 1000;
     if (typeof limit == 'string') limit = parseInt(limit);
     let result=await Pool.getPoolList(0,'',page,limit);
     return ctx.body=new rData(ctx,'GET_POOL_LIST',result);
+}
+
+/**
+ * @function 获取单个池子信息
+ * @author wss
+ */
+ exports.getPoolDetails = async(ctx)=>{
+    let poolID = ctx.query.poolID;
+    let result=await Pool.getPoolDetails(poolID);
+    return ctx.body=new rData(ctx,'GET_POOL',result.data);
 }
 
 /**

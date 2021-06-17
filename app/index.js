@@ -26,6 +26,8 @@ router
   .get('/token/currency/list', Token.getTokenList)
   // 获取池子列表
   .get('/pool/poollist', Pool.getPoolList)
+   // 获取池子信息
+   .get('/pool/details', Pool.getPoolDetails)
   // 获取个人池子币种列表
   .get('/pool/mypool/list', Pool.getMyPoolList)
   // 获取流动池列表

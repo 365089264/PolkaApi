@@ -117,6 +117,74 @@ const cptBase=new BigNumber(Math.pow(10,10));
 }
 
 /**
+ * @function 查询池子列表
+ * @param  {number} page         // 分页
+ * @param  {number} limit
+ * @returns {array} [{}]
+ * @author  wss
+ */
+ exports.getPoolDetails= async (poolID) => {
+    let query = queryFormat('select poolID,controllerID,tokenNums,swapFee,cptAmount,denormal from tb_pool_history where poolID = ? order by createdAt desc', [poolID]);
+    let result= await P(pool, 'query', query);
+    for (let i=0;i<result.length;i++){
+        let r={
+            id:result[i].poolID,
+            poolAddress:result[i].poolID,
+            controller:result[i].controllerID,
+            swapFee:result[i].swapFee,
+            swaps:[],
+            tokens:[],
+            tokensList:[],
+            totalShares:result[i].cptAmount,
+            totalWeight:result[i].denormal,
+            finalized: true,
+            crp: false,
+            publicSwap: true,
+
+
+        };
+        let totalDenormal=new BigNumber(result[i].denormal);
+        
+        query=queryFormat('select b.symbol,a.tokenAddress ,a.tokenName , a.poolID ,a.amount ,a.denormal,b.decimals,b.precisions,b.price,b.color,b.hasIcon,b.logoURL from tb_pool_token a inner join tb_tokenPrice b on a.tokenAddress=b.tokenAddress where a.poolID=? order by a.tokenIndex',r.id);
+        let tokens=await P(pool,'query',query);
+        for (let c of tokens){
+            let denormal=new BigNumber(c.denormal);
+            r.tokens.push({
+                id: r.poolID,
+                address: c.tokenAddress,
+                symbol: c.symbol,
+                balance: c.amount,
+                decimals: c.decimals,
+                precision: c.precisions,
+                color: c.color,
+                hasIcon: c.hasIcon,
+                logoURL: c.logoURL,
+                denormWeight: denormal,
+                num:denormal.multipliedBy(100).dividedToIntegerBy(totalDenormal)
+            });
+            r.tokensList.push(c.tokenAddress)
+        }
+
+        query=queryFormat('select count(1) as count,sum(swapVolume) as totalSwapVolume from tb_pool_swap where poolID=? ',r.id);
+        let swapsTotal=await P(pool,'query',query);
+        r.swapsCount=swapsTotal[0].count;
+        r.swaps.push({poolTotalSwapVolume:swapsTotal[0].totalSwapVolume});
+        r.totalSwapVolume=swapsTotal[0].totalSwapVolume;
+
+        query=queryFormat('select count(distinct accountID) as count from tb_liquidity where poolID=? ',r.id);
+        let holders=await P(pool,'query',query);
+        r.holdersCount=holders[0].count;
+
+        query=queryFormat('select count(1) as count from tb_pool_swap where poolID=? ',r.id);
+
+        result[i]=r;
+    }
+    return {
+        data: result.length ? result[0] : {}
+    }
+}
+
+/**
  * @function 创建pool
  * @param {string} poolID  // 池子地址
  * @param {string} accountID  // 创建账号地址
